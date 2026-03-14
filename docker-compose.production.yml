@@ -11,7 +11,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend/
+    image: slavaa/kittygram_backend:latest
     env_file: .env
     volumes:
       - static:/static
@@ -20,14 +20,14 @@ services:
       - db
 
   frontend:
+    image: slavaa/kittygram_frontend:latest
     env_file: .env
-    build: ./frontend/
     command: sh -c "mkdir -p /static/frontend && cp -r /app/build/. /static/frontend/"
     volumes:
       - static:/static
 
   gateway:
-    build: ./nginx/
+    image: slavaa/kittygram_gateway:latest
     env_file: .env
     ports:
       - 9000:80

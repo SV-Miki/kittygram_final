@@ -16,7 +16,8 @@ class Migration(migrations.Migration):
             name='Achievement',
             fields=[
                 ('id', models.BigAutoField(
-                    auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    auto_created=True, primary_key=True,
+                    serialize=False, verbose_name='ID'
                 )
                  ),
                 ('name', models.CharField(max_length=64)),
@@ -26,11 +27,13 @@ class Migration(migrations.Migration):
             name='AchievementCat',
             fields=[
                 ('id', models.BigAutoField(
-                    auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    auto_created=True, primary_key=True,
+                    serialize=False, verbose_name='ID'
                 )
                  ),
                 ('achievement', models.ForeignKey(
-                    on_delete=django.db.models.deletion.CASCADE, to='cats.achievement'
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='cats.achievement'
                 )
                  ),
             ],
@@ -39,7 +42,8 @@ class Migration(migrations.Migration):
             name='Cat',
             fields=[
                 ('id', models.BigAutoField(
-                    auto_created=True, primary_key=True, serialize=False, verbose_name='ID'
+                    auto_created=True, primary_key=True,
+                    serialize=False, verbose_name='ID'
                 )
                  ),
                 ('name', models.CharField(max_length=16)),

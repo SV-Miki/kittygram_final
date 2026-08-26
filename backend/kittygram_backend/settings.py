@@ -1,19 +1,24 @@
 import os
 from pathlib import Path
 
-from django.core.management.utils import get_random_secret_key
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-local-development-key')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1',
+).split(',')
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://kittygram-slava.hopto.org",
+    origin
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin
 ]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,13 +71,10 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', 5432),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -107,8 +109,6 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 
@@ -116,29 +116,20 @@ STATIC_URL = '/static_backend/'
 STATIC_ROOT = '/static/backend'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        (
-            'rest_framework.permissions.'
-            'IsAuthenticated'
-        ),
+        'rest_framework.permissions.IsAuthenticated',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        (
-            'rest_framework.authentication.'
-            'TokenAuthentication'
-        ),
+        'rest_framework.authentication.TokenAuthentication',
     ],
-
     'DEFAULT_PAGINATION_CLASS': (
-        'rest_framework.pagination.'
-        'PageNumberPagination'
+        'rest_framework.pagination.PageNumberPagination'
     ),
-
     'PAGE_SIZE': 10,
 }

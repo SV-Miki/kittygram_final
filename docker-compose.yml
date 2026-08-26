@@ -20,7 +20,6 @@ services:
       - db
 
   frontend:
-    env_file: .env
     build: ./frontend/
     command: sh -c "mkdir -p /static/frontend && cp -r /app/build/. /static/frontend/"
     volumes:
@@ -28,7 +27,6 @@ services:
 
   gateway:
     build: ./nginx/
-    env_file: .env
     ports:
       - 9000:80
     volumes:

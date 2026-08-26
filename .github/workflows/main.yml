@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   tests_backend:
@@ -40,11 +41,10 @@ jobs:
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8==7.1.1
-          pip install -r backend/requirements.txt
+          python -m pip install -r backend/requirements.txt
 
-      - name: Lint backend with flake8
-        run: flake8 backend/
+      - name: Lint backend with Ruff
+        run: python -m ruff check backend/
 
       - name: Run backend tests
         env:
@@ -162,6 +162,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     needs:
       - build_and_push_backend
       - build_and_push_frontend
@@ -172,7 +173,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Copy docker-compose.production.yml to server
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
@@ -181,7 +182,7 @@ jobs:
           target: "/home/ubuntu/kittygram"
 
       - name: Deploy on server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
@@ -190,14 +191,18 @@ jobs:
             cd /home/ubuntu/kittygram
 
             cat > .env <<EOF
-            POSTGRES_DB=kittygram
-            POSTGRES_USER=kittygram_user
-            POSTGRES_PASSWORD=kittygram_password
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             DB_HOST=db
             DB_PORT=5432
-            SECRET_KEY=prod-secret-key
+
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
             DEBUG=False
-            ALLOWED_HOSTS=kittygram-slava.hopto.org,127.0.0.1,localhost
+            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
+            CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }}
+
+            DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             EOF
 
             sudo docker compose -f docker-compose.production.yml pull
@@ -208,11 +213,12 @@ jobs:
 
   send_message:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     needs: deploy
 
     steps:
       - name: Send Telegram message
-        uses: appleboy/telegram-action@master
+        uses: appleboy/telegram-action@v1.0.0
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -220,6 +226,5 @@ jobs:
             Kittygram successfully deployed!
             Repository: ${{ github.repository }}
             Actor: ${{ github.actor }}
-            Commit message: ${{ github.event.commits[0].message }}
             Commit: ${{ github.sha }}
             Link: https://github.com/${{ github.repository }}/commit/${{ github.sha }}

@@ -50,7 +50,7 @@ Backend и frontend приложения были предоставлены к�
 ## Структура проекта
 
 ```text
-kittygram_final/
+kittygram/
 ├── .github/
 │   └── workflows/
 │       └── main.yml                    # CI/CD workflow
@@ -121,8 +121,8 @@ kittygram_final/
 Клонируйте репозиторий:
 
 ```bash
-git clone https://github.com/SV-Miki/kittygram_final.git
-cd kittygram_final
+git clone git@github.com:SV-Miki/kittygram.git
+cd kittygram
 ```
 
 Создайте `.env` на основе примера:
